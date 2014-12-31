@@ -3,6 +3,8 @@ import getopt
 import unicodedata
 import os.path
 
+import langid
+
 CHARACTER_REPLACEMENTS = {
     "128" : "",
     "130" : "", #Can't tell
@@ -187,41 +189,37 @@ def lookup_replacement(chars):
     else:
         return None
 
-def fix_characters(file_name):
-    result = []
-    bad_tweets = 0
-    for line in open(file_name):
-        okay = False
-        while not okay:
-            try:
-                line.encode("utf-8")
-                okay = True
-            except:
-                start_point = None
-                end_point = None
-                bad_chars = 0
-                for i in range(len(line)):
-                    char = line[i]
-                    try:
-                        char.encode("utf-8")
-                        if start_point != None and end_point == None:
-                            end_point = i
-                    except:
-                        bad_chars += 1
-                        if start_point == None:
-                            start_point = i
+def fix_characters(line):
+    okay = False
+    while not okay:
+        try:
+            line.encode("utf-8")
+            okay = True
+        except:
+            start_point = None
+            end_point = None
+            bad_chars = 0
+            for i in range(len(line)):
+                char = line[i]
+                try:
+                    char.encode("utf-8")
+                    if start_point != None and end_point == None:
+                        end_point = i
+                except:
+                    bad_chars += 1
+                    if start_point == None:
+                        start_point = i
 
-                if len(line) - bad_chars > len(line) / 1.5:
-                    replacement = find_replacement(line[start_point:end_point])
-                    if replacement == 1:
-                        bad_tweets += 1
-                        print line + " " + str(start_point) + " " + str(end_point)
-                        sys.exit(1)
-                    line = line[0:start_point] + replacement + line[end_point:]
-                else:
-                    print "line mostly crap : " + line
-                    line = ""
-    return bad_tweets
+            if len(line) - bad_chars > len(line) / 1.5:
+                replacement = find_replacement(line[start_point:end_point])
+                if replacement == 1:
+                    print line + " " + str(start_point) + " " + str(end_point)
+                    sys.exit(1)
+                line = line[0:start_point] + replacement + line[end_point:]
+            else:
+#                print "line mostly crap : " + line
+                line = None
+    return (line)
 
 def find_replacement(character_string):
     chars = [str(ord(char)) for char in character_string]
@@ -254,27 +252,3 @@ def find_replacement(character_string):
     else:
         return replacement
 
-def verify_args(args):
-    for a in args:
-        if not os.path.isfile(args[0]):
-            print "Input (" + args[0] + ") is not a file"
-            return False
-    return True
-
-#Main method as suggested by van Rossum, simplified
-def main(argv=None):
-    if argv is None:
-        argv = sys.argv
-    try:
-        opts, args = getopt.getopt(argv[1:], "h", ["help"])
-    except:
-        print "Error in args : " + str(argv[1:])
-        return 2
-    bad_tweets = 0
-    if verify_args(args):
-        for arg in args:
-            bad_tweets += fix_characters(arg)
-    print bad_tweets
-
-if __name__ == "__main__":
-    sys.exit(main())
