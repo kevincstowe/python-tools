@@ -3,8 +3,6 @@ import getopt
 import unicodedata
 import os.path
 
-import langid
-
 CHARACTER_REPLACEMENTS = {
     "128" : "",
     "130" : "", #Can't tell
@@ -210,15 +208,20 @@ def fix_characters(line):
                     if start_point == None:
                         start_point = i
 
-            if len(line) - bad_chars > len(line) / 1.5:
+            #In case string is ONLY bad chars
+            if start_point != None and end_point == None:
+                end_point = len(line)
+
+            if len(line) < 10 or len(line) - bad_chars > len(line) / 1.5:
                 replacement = find_replacement(line[start_point:end_point])
+                #No replacement found, new char
                 if replacement == 1:
                     print line + " " + str(start_point) + " " + str(end_point)
                     sys.exit(1)
                 line = line[0:start_point] + replacement + line[end_point:]
             else:
-#                print "line mostly crap : " + line
-                line = None
+                print "line mostly crap : " + line
+                line = ""
     return (line)
 
 def find_replacement(character_string):
