@@ -26,6 +26,8 @@ def main(argv=None):
         print "Error in args : " + str(argv[1:])
         return 2
 
+    minsize = 0
+
     for o, a in opts:
         if o in ["-m", "--minsize"]:
             minsize = int(a)
