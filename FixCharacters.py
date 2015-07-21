@@ -3,6 +3,8 @@ import getopt
 import unicodedata
 import os.path
 
+from sets import Set
+
 CHARACTER_REPLACEMENTS = {
     "128" : "",
     "130" : "", #Can't tell
@@ -64,6 +66,7 @@ CHARACTER_REPLACEMENTS = {
     "219" : "", #Can't tell, $ maybe?
     "221" : "", #Can't tell
     "225" : "",
+    "226" : "", #Can't tell
     "227" : "",
     "231" : "",
     "235" : "",
@@ -86,7 +89,9 @@ CHARACTER_REPLACEMENTS = {
     "194 172" : "<", #Weird down left corner
     "194 173" : "", #Can't tell
     "194 174" : "C", #C with circle
+    "194 175" : "-", #High line
     "194 176" : "o", #Degree marker
+    "194 177" : "+-", #+ on top of - 
     "194 178" : "^2", #2nd power symbol
     "194 182" : "P", #new paragraph sign
     "194 184" : "", #hard to tell
@@ -97,6 +102,7 @@ CHARACTER_REPLACEMENTS = {
     "195 132" : "AE", #A with umlaut
     "195 133" : "AE", #A with umlaut
     "195 137" : "E", #E with accent
+    "195 152" : "O", #O with slash
     "195 159" : "B", #Esset
     "195 161" : "a", #a with accent
     "195 162" : "a", #a with carrot
@@ -127,6 +133,7 @@ CHARACTER_REPLACEMENTS = {
     "198 146" : "f", #swoopy f
     "203 156" : "-", #weird high hyphen
     "206 178" : "B", #Esset
+    #217 XXX seems to be Arabic
     "226 128 143" : "", #Nothing?
     "226 128 147" : "-", #Weird hyphen
     "226 128 148" : "-", #Weird hyphen
@@ -168,6 +175,7 @@ CHARACTER_REPLACEMENTS = {
     "227 129 175" : "", #Chinese character
     "227 133 139" : "", #Weird double left wind sign something
     "227 133 142" : "", #Circle with hat
+    #230 XXX XXX appear to be chinese
     "238 144 139" : "", #Up and left weird arrow
     "238 144 141" : "", #Down and left weird arrow
     "239 191 189" : "?", #Not sure - maybe question mark box?
@@ -179,15 +187,23 @@ CHARACTER_REPLACEMENTS = {
 def lookup_replacement(chars):
     #Emoji
     if len(chars.split()) == 4 and chars[0:7] == "240 159":
-        return ""
+        return "{?}"
+    #These appear to be arabic
+    elif len(chars.split()) == 2 and chars[0:3] in ["217", "216"]:
+        return "{?}"
+    #These appear to be chinese
+    elif len(chars.split()) == 3 and chars[0:3] == "230":
+        return "{?}"
     #Other char in map
     elif chars in CHARACTER_REPLACEMENTS.keys():
+        if CHARACTER_REPLACEMENTS[chars] == "":
+            return "{?}"
         return CHARACTER_REPLACEMENTS[chars]
     #Couldn't find
     else:
         return None
 
-def fix_characters(line):
+def fix_characters(line, line_length=False):
     okay = False
     while not okay:
         try:
@@ -217,12 +233,15 @@ def fix_characters(line):
                 #No replacement found, new char
                 if replacement == 1:
                     print line + " " + str(start_point) + " " + str(end_point)
-                    sys.exit(1)
+                    replacement = ""
                 line = line[0:start_point] + replacement + line[end_point:]
             else:
                 print "line mostly crap : " + line
                 line = ""
-    return (line)
+    if line_length:
+        return (line, len(line) + bad_chars)
+    else:
+        return line
 
 def find_replacement(character_string):
     chars = [str(ord(char)) for char in character_string]
@@ -254,4 +273,5 @@ def find_replacement(character_string):
         return 1
     else:
         return replacement
+
 
