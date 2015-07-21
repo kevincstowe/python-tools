@@ -73,7 +73,9 @@ def add_anns_to_tweets(tweets, annotations):
         for a in annotations:
             if t.span_start <= a.span_start and t.span_end >= a.span_end:
                 t.annotations.append(a.entity_type)
-
+        if not t.annotations:
+            t.annotations = ["None"]
+            
 def main():
     all_tweets = {}
     annotators_tweets = {"paas8434":[], "saal5182":[]}
@@ -85,8 +87,15 @@ def main():
                 if len(f_data)>2 and f_data[-2] == "completed" and f_data[-3] == a :
                     
                     annotators_tweets[a] += load(os.path.join(root, f))
-    cPickle.dump(annotators_tweets["paas8434"], open("paas8434_anns", "w"))
-    cPickle.dump(annotators_tweets["saal5182"], open("saal5182_anns", "w"))
+
+    paas_tweets = {}
+    saal_tweets = {}
+    for tweet in annotators_tweets["paas8434"]:
+        paas_tweets[tweet.tweet_id] = tweet
+    for tweet in annotators_tweets["saal5182"]:
+        saal_tweets[tweet.tweet_id] = tweet
+    cPickle.dump(paas_tweets, open("paas8434_anns", "w"))
+    cPickle.dump(saal_tweets, open("saal5182_anns", "w"))
 
                             
         
