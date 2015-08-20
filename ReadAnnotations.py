@@ -103,6 +103,14 @@ def load_tweets(file_name):
 def add_anns_to_tweets(tweets, annotations):
     margin = 10
     for t in tweets:
+<<<<<<< HEAD
+        for a in annotations:
+            if t.span_start <= a.span_start and t.span_end >= a.span_end:
+                t.annotations.append(a.entity_type)
+        if not t.annotations:
+            t.annotations = ["None"]
+            
+=======
         for w in t.words:
             rel_start = t.span_start + w.span_start
             rel_end = t.span_start + w.span_end
@@ -114,9 +122,33 @@ def add_anns_to_tweets(tweets, annotations):
                         else:
                             w.add_annotation("I-" + a.entity_type.strip())
 
+>>>>>>> 1928e2b7e5d2381cc13d4d0704cb20aa80ad90a2
 def main():
     args = sys.argv[1:]
     all_tweets = {}
+<<<<<<< HEAD
+    annotators_tweets = {"paas8434":[], "saal5182":[]}
+    for root, dirs, files in os.walk(XML_dir):
+        for i in range(len(files)):
+            f = files[i]
+            f_data = f.split(".")
+            for a in annotators:    
+                if len(f_data)>2 and f_data[-2] == "completed" and f_data[-3] == a :
+                    
+                    annotators_tweets[a] += load(os.path.join(root, f))
+
+    paas_tweets = {}
+    saal_tweets = {}
+    for tweet in annotators_tweets["paas8434"]:
+        paas_tweets[tweet.tweet_id] = tweet
+    for tweet in annotators_tweets["saal5182"]:
+        saal_tweets[tweet.tweet_id] = tweet
+    cPickle.dump(paas_tweets, open("paas8434_anns", "w"))
+    cPickle.dump(saal_tweets, open("saal5182_anns", "w"))
+
+                            
+        
+=======
     if len(args) > -1:
         for root, dirs, files in os.walk(XML_dir):
             for i in range(len(files)):
@@ -152,5 +184,6 @@ def main2():
 
         Writer.write_tweets_crf_gold(person_tweets, f, "/home/kevin/Documents/Epic/NER/Input/Gold/CrfGoldTest/", ["Person"])
 
+>>>>>>> 1928e2b7e5d2381cc13d4d0704cb20aa80ad90a2
 if __name__ == "__main__":
     main()
