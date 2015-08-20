@@ -28,8 +28,6 @@ class Tweet(object):
         self.span_end = span_end
         self.tweet_file = tweet_file
 
-        self.annotations = []
-
         if populate_id:
             self.populate_tweet_id()
         if populate_words:
@@ -55,9 +53,10 @@ class Tweet(object):
                     length = len(token.encode("UTF-8"))
                 except:
                     token, length = FixCharacters.fix_characters(token, True)
-                word = Word(token, start, start+length)
+                if len(token.strip()) >= 1:
+                    word = Word(token, start, start+length)
+                    self.words.append(word)
                 start += length
-                self.words.append(word)
             start += 1
         self.fix_text()
 
@@ -85,13 +84,17 @@ class Tweet(object):
         part_1 = []
         part_2 = []
         part_3 = []
-        for word in self.words:
+        for i in range(len(self.words)):
+            word = self.words[i]
             part_1 = [word.text]
             if add_features:
                 part_2 = word.features
             if tag:
                 if "I-" + tag in word.annotations:
                     part_3 = ["I-" + tag]
+                    if "O-none" in self.words[i-1].annotations:
+                        print self.words
+                        sys.exit()
                 elif "B-" + tag in word.annotations:
                     part_3 = ["B-" + tag]
                 else:
