@@ -38,8 +38,8 @@ def main(argv=None):
             if size:
                 print arg + " : " + size
     else:
-        print "Need at least one arg..."
-        return 1
-
+        print "No arg, defaulting to local directory"
+        size = get_size(".", minsize)
+        print "./ : " + size
 if __name__ == "__main__":
     sys.exit(main())
