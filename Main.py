@@ -8,7 +8,7 @@ def main(argv=None):
     try:
         opts, args = getopt.getopt(argv[1:], "h", ["help"])
     except:
-        print "Error in args : " + str(argv[1:])
+        print ("Error in args : " + str(argv[1:]))
         return 2
 
     #Use opts and args here
