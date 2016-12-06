@@ -23,7 +23,7 @@ def main(argv=None):
         opts, args = getopt.getopt(argv[1:], "hm:", ["help", "minsize="])
 
     except:
-        print "Error in args : " + str(argv[1:])
+        print ("Error in args : " + str(argv[1:]))
         return 2
 
     minsize = 0
@@ -36,10 +36,11 @@ def main(argv=None):
         for arg in args:         
             size = get_size(arg, minsize)
             if size:
-                print arg + " : " + size
+                print (arg + " : " + size)
     else:
-        print "No arg, defaulting to local directory"
+        print ("No arg, defaulting to local directory")
         size = get_size(".", minsize)
-        print "./ : " + size
+        print ("./ : " + size)
+
 if __name__ == "__main__":
     sys.exit(main())
